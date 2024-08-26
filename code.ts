@@ -94,7 +94,7 @@ if (selection.length > 0) {
   }
   figma.notify(`✨ Done, ${totalRenamed} Layers Renamed ✨`);
 } else {
-  figma.notify('Bitte wählen Sie mindestens einen Frame aus');
+  figma.notify(`🙈 Oops! Please select at least one frame to get started 🎨`);
 }
 
 figma.closePlugin();
