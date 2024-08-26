@@ -10,15 +10,13 @@ function renameNode(node, isInsideComponentOrInstance = false, isRootNode = true
         return renamedCount;
     }
     if (!isInsideComponentOrInstance) {
-        let renamed = false;
+        let newName = '';
         if (isRootNode && node.type === 'FRAME' && 'width' in node && node.width === 1680) {
-            node.name = 'Screen';
-            renamed = true;
+            newName = 'Screen';
         }
         else if (isMask(node)) {
-            node.name = 'Mask';
-            renamed = true;
-            if (node.parent && node.parent.type === 'GROUP') {
+            newName = 'Mask';
+            if (node.parent && node.parent.type === 'GROUP' && node.parent.name !== 'Mask Group') {
                 node.parent.name = 'Mask Group';
                 renamedCount++;
             }
@@ -26,58 +24,51 @@ function renameNode(node, isInsideComponentOrInstance = false, isRootNode = true
         else if (node.type === 'RECTANGLE' || node.type === 'ELLIPSE' || node.type === 'POLYGON' || node.type === 'STAR' || node.type === 'VECTOR') {
             if ('fills' in node && 'strokes' in node) {
                 if (hasOnlyStroke(node)) {
-                    node.name = 'Line';
+                    newName = 'Line';
                 }
                 else if (Array.isArray(node.fills) && node.fills.length > 0) {
                     if (node.fills.some((fill) => fill.type === 'IMAGE')) {
-                        node.name = 'Image';
+                        newName = 'Image';
                     }
                     else if (node.fills.some((fill) => {
                         return fill.type === 'GRADIENT_LINEAR' || fill.type === 'GRADIENT_RADIAL' ||
                             fill.type === 'GRADIENT_ANGULAR' || fill.type === 'GRADIENT_DIAMOND';
                     })) {
-                        node.name = 'Gradient';
+                        newName = 'Gradient';
                     }
                     else {
-                        node.name = 'Shape';
+                        newName = 'Shape';
                     }
                 }
                 else {
-                    node.name = 'Shape';
+                    newName = 'Shape';
                 }
             }
             else {
-                node.name = 'Shape';
+                newName = 'Shape';
             }
-            renamed = true;
         }
         else if (node.type === 'LINE') {
-            node.name = 'Line';
-            renamed = true;
+            newName = 'Line';
         }
         else if (node.type === 'FRAME') {
             if ('layoutMode' in node && node.layoutMode !== 'NONE') {
-                node.name = 'Wrapper';
+                newName = 'Wrapper';
                 if (node.parent && (node.parent.type === 'FRAME' || node.parent.type === 'COMPONENT' || node.parent.type === 'INSTANCE') && 'layoutMode' in node.parent && node.parent.layoutMode !== 'NONE') {
-                    node.name = node.layoutMode === 'VERTICAL' ? 'Inner-column' : 'Inner-row';
+                    newName = node.layoutMode === 'VERTICAL' ? 'Inner-column' : 'Inner-row';
                 }
             }
             else {
-                node.name = 'Contain';
+                newName = 'Contain';
             }
-            renamed = true;
         }
         else if (node.type === 'GROUP') {
-            if (node.children.some(child => isMask(child))) {
-                node.name = 'Mask Group';
-            }
-            else {
-                node.name = 'Group';
-            }
-            renamed = true;
+            newName = node.children.some(child => isMask(child)) ? 'Mask Group' : 'Group';
         }
-        if (renamed)
+        if (newName && node.name !== newName) {
+            node.name = newName;
             renamedCount++;
+        }
     }
     if ('children' in node) {
         for (const child of node.children) {
