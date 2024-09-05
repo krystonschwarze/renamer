@@ -62,8 +62,11 @@ function renameNode(node, isInsideComponentOrInstance = false, isRootNode = true
             renamed = true;
         }
         else if (node.type === 'FRAME') {
-            // Rename frames based on their layout mode
-            if ('layoutMode' in node && node.layoutMode !== 'NONE') {
+            // Rename frames based on their layout mode or height
+            if ('height' in node && node.height === 1) {
+                node.name = 'Divider';
+            }
+            else if ('layoutMode' in node && node.layoutMode !== 'NONE') {
                 node.name = 'Wrapper';
                 if (node.parent && (node.parent.type === 'FRAME' || node.parent.type === 'COMPONENT' || node.parent.type === 'INSTANCE') && 'layoutMode' in node.parent && node.parent.layoutMode !== 'NONE') {
                     node.name = node.layoutMode === 'VERTICAL' ? 'Inner-column' : 'Inner-row';

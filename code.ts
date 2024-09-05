@@ -54,8 +54,10 @@ function renameNode(node: SceneNode, isInsideComponentOrInstance: boolean = fals
       (node as BaseNode).name = 'Line';
       renamed = true;
     } else if (node.type === 'FRAME') {
-      // Rename frames based on their layout mode
-      if ('layoutMode' in node && node.layoutMode !== 'NONE') {
+      // Rename frames based on their layout mode or height
+      if ('height' in node && node.height === 1) {
+        (node as BaseNode).name = 'Divider';
+      } else if ('layoutMode' in node && node.layoutMode !== 'NONE') {
         (node as BaseNode).name = 'Wrapper';
         if (node.parent && (node.parent.type === 'FRAME' || node.parent.type === 'COMPONENT' || node.parent.type === 'INSTANCE') && 'layoutMode' in node.parent && node.parent.layoutMode !== 'NONE') {
           (node as BaseNode).name = node.layoutMode === 'VERTICAL' ? 'Inner-column' : 'Inner-row';
